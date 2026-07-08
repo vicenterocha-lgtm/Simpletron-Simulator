@@ -9,3 +9,8 @@ BITÁCORA DE DESARROLLO - SIMULADOR SIMPLETRON
 * Próximos pasos planificados:
   - Diseñar la interfaz de carga de instrucciones.
   - Implementar la validación del rango de operaciones en memoria.
+
+[2026-07-07] - Proteccion de memoria y entrada de datos
+--------------------------------------------------
+* Se modularizo la validacion de rangos mediante la funcion 'validarRango'.
+* Se agrego un ciclo de validacion en la operacion READ para asegurar que los datos ingresados en ejecucion no desborden la memoria.

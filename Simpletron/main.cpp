@@ -3,7 +3,6 @@
 
 using namespace std;
 
-
 const int READ = 10;
 const int WRITE = 11;
 const int LOAD = 20;
@@ -17,6 +16,13 @@ const int BRANCHNEG = 41;
 const int BRANCHZERO = 42;
 const int HALT = 43;
 
+// Funcion para validar que los valores esten en el rango correcto
+bool validarRango(int valor) {
+    if (valor < -9999 || valor > 9999) {
+        return false;
+    }
+    return true;
+}
 
 void dump(int accumulator, int instructionCounter, int instructionRegister, int operationCode, int operand, int memory[]) {
     cout << "\n*** REGISTROS ***\n";
@@ -54,7 +60,6 @@ int main() {
     cout << "*** Entonces usted tecleara la palabra para esa ubicacion. ***\n";
     cout << "*** Teclee -99999 para terminar de introducir el programa. ***\n\n";
 
-
     int entrada = 0;
     int ubicacion = 0;
     while (ubicacion < 100) {
@@ -62,9 +67,8 @@ int main() {
         cin >> entrada;
         if (entrada == -99999) break;
         
-
-        if (entrada < -9999 || entrada > 9999) {
-            cout << "*** Instruccion invalida. Intente de nuevo. ***\n";
+        if (!validarRango(entrada)) {
+            cout << "*** Error: Valor fuera del rango permitido (-9999 a +9999). Intente de nuevo. ***\n";
             continue;
         }
         memory[ubicacion] = entrada;
@@ -76,20 +80,27 @@ int main() {
 
     bool keepRunning = true;
     while (keepRunning) {
-
         instructionRegister = memory[instructionCounter];
-
-
         operationCode = instructionRegister / 100;
         operand = instructionRegister % 100;
 
-
         switch (operationCode) {
-            case READ:
-                cout << "Ingrese un entero: ";
-                cin >> memory[operand];
+            case READ: {
+                int valorEntrada = 0;
+                bool entradaValida = false;
+                while (!entradaValida) {
+                    cout << "Ingrese un entero (-9999 a +9999): ";
+                    cin >> valorEntrada;
+                    if (validarRango(valorEntrada)) {
+                        memory[operand] = valorEntrada;
+                        entradaValida = true;
+                    } else {
+                        cout << "*** Error: Entrada invalida. Intente de nuevo. ***\n";
+                    }
+                }
                 instructionCounter++;
                 break;
+            }
                 
             case WRITE:
                 cout << "Salida: " << memory[operand] << endl;
@@ -156,13 +167,11 @@ int main() {
                 break;
         }
 
-
         if (instructionCounter < 0 || instructionCounter >= 100) {
             cout << "\n*** ERROR: CONTADOR DE INSTRUCCIONES FUERA DE RANGO ***\n";
             keepRunning = false;
         }
     }
-
 
     dump(accumulator, instructionCounter, instructionRegister, operationCode, operand, memory);
 

@@ -1,0 +1,11 @@
+==================================================
+BITÁCORA DE DESARROLLO - SIMULADOR SIMPLETRON
+==================================================
+
+[2026-07-07] - Inicialización del proyecto y estructura
+--------------------------------------------------
+* Se reorganizó el repositorio para separar los módulos de código.
+* Se migró el código base del simulador (main.cpp) a la carpeta exclusiva 'Simpletron'.
+* Próximos pasos planificados:
+  - Diseñar la interfaz de carga de instrucciones.
+  - Implementar la validación del rango de operaciones en memoria.

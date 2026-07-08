@@ -1,7 +1,10 @@
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <string>
 
 using namespace std;
+
 
 const int READ = 10;
 const int WRITE = 11;
@@ -16,7 +19,7 @@ const int BRANCHNEG = 41;
 const int BRANCHZERO = 42;
 const int HALT = 43;
 
-// Funcion para validar que los valores esten en el rango correcto
+
 bool validarRango(int valor) {
     if (valor < -9999 || valor > 9999) {
         return false;
@@ -24,61 +27,65 @@ bool validarRango(int valor) {
     return true;
 }
 
-void dump(int accumulator, int instructionCounter, int instructionRegister, int operationCode, int operand, int memory[]) {
-    cout << "\n*** REGISTROS ***\n";
-    cout << "accumulator          " << setfill(' ') << setw(5) << internal << showpos << accumulator << endl;
-    cout << "instructionCounter   " << setfill('0') << setw(2) << noshowpos << instructionCounter << endl;
-    cout << "instructionRegister  " << setfill(' ') << setw(5) << internal << showpos << instructionRegister << endl;
-    cout << "operationCode        " << setfill('0') << setw(2) << noshowpos << operationCode << endl;
-    cout << "operand              " << setfill('0') << setw(2) << noshowpos << operand << endl;
 
-    cout << "\n*** MEMORIA ***\n       ";
-    for (int i = 0; i < 10; i++) cout << setw(5) << i << " ";
-    cout << "\n";
-
-    for (int i = 0; i < 100; i += 10) {
-        cout << setw(3) << i << "  ";
-        for (int j = 0; j < 10; j++) {
-            cout << setfill(' ') << setw(5) << internal << showpos << memory[i + j] << " ";
-        }
-        cout << "\n";
-    }
-}
-
-int main() {
-    int memory[100] = {0}; 
-    int accumulator = 0;
-    int instructionCounter = 0;
-    int instructionRegister = 0;
-    int operationCode = 0;
-    int operand = 0;
-    
+void mostrarBienvenida() {
     cout << "*** Bienvenido a Simpletron! ***\n";
     cout << "*** Por favor, introduzca su programa una instruccion ***\n";
     cout << "*** (o palabra de datos) a la vez. Yo tecleare el ***\n";
     cout << "*** numero de ubicacion y un signo de interrogacion (?). ***\n";
     cout << "*** Entonces usted tecleara la palabra para esa ubicacion. ***\n";
     cout << "*** Teclee -99999 para terminar de introducir el programa. ***\n\n";
+}
 
-    int entrada = 0;
-    int ubicacion = 0;
-    while (ubicacion < 100) {
-        cout << setfill('0') << setw(2) << ubicacion << " ? ";
-        cin >> entrada;
-        if (entrada == -99999) break;
+
+void cargarPrograma(int memory[]) {
+    ifstream archivo("programa.sml");
+    
+    if (archivo.is_open()) {
+        cout << "*** Cargando programa de forma automatica desde 'programa.sml'... ***\n";
+        int entrada = 0;
+        int ubicacion = 0;
         
-        if (!validarRango(entrada)) {
-            cout << "*** Error: Valor fuera del rango permitido (-9999 a +9999). Intente de nuevo. ***\n";
-            continue;
+        while (ubicacion < 100 && archivo >> entrada) {
+            if (entrada == -99999) break;
+            
+            if (!validarRango(entrada)) {
+                cout << "*** Error en archivo (posicion " << ubicacion << "): Valor fuera de rango. Ejecucion abortada. ***\n";
+                archivo.close();
+                exit(1);
+            }
+            memory[ubicacion] = entrada;
+            ubicacion++;
         }
-        memory[ubicacion] = entrada;
-        ubicacion++;
+        archivo.close();
+        cout << "*** Carga automatica desde archivo terminada con exito ***\n\n";
+    } else {
+        cout << "--- Archivo 'programa.sml' no encontrado. Conservando carga interactiva linea por linea. ---\n\n";
+        mostrarBienvenida();
+        
+        int entrada = 0;
+        int ubicacion = 0;
+        while (ubicacion < 100) {
+            cout << setfill('0') << setw(2) << ubicacion << " ? ";
+            cin >> entrada;
+            if (entrada == -99999) break;
+            
+            if (!validarRango(entrada)) {
+                cout << "*** Error: Valor fuera del rango permitido (-9999 a +9999). Intente de nuevo. ***\n";
+                continue;
+            }
+            memory[ubicacion] = entrada;
+            ubicacion++;
+        }
+        cout << "*** Carga del programa terminada ***\n";
     }
+}
 
-    cout << "*** Carga del programa terminada ***\n";
+// Funcion para ejecutar el programa cargado en memoria
+void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, int& instructionRegister, int& operationCode, int& operand) {
     cout << "*** Comienza la ejecucion del programa ***\n\n";
-
     bool keepRunning = true;
+    
     while (keepRunning) {
         instructionRegister = memory[instructionCounter];
         operationCode = instructionRegister / 100;
@@ -172,7 +179,41 @@ int main() {
             keepRunning = false;
         }
     }
+}
 
+
+void dump(int accumulator, int instructionCounter, int instructionRegister, int operationCode, int operand, int memory[]) {
+    cout << "\n*** REGISTROS ***\n";
+    cout << "accumulator          " << setfill(' ') << setw(5) << internal << showpos << accumulator << endl;
+    cout << "instructionCounter   " << setfill('0') << setw(2) << noshowpos << instructionCounter << endl;
+    cout << "instructionRegister  " << setfill(' ') << setw(5) << internal << showpos << instructionRegister << endl;
+    cout << "operationCode        " << setfill('0') << setw(2) << noshowpos << operationCode << endl;
+    cout << "operand              " << setfill('0') << setw(2) << noshowpos << operand << endl;
+
+    cout << "\n*** MEMORIA ***\n       ";
+    for (int i = 0; i < 10; i++) cout << setw(5) << i << " ";
+    cout << "\n";
+
+    for (int i = 0; i < 100; i += 10) {
+        cout << setw(3) << i << "  ";
+        for (int j = 0; j < 10; j++) {
+            cout << setfill(' ') << setw(5) << internal << showpos << memory[i + j] << " ";
+        }
+        cout << "\n";
+    }
+}
+
+int main() {
+    int memory[100] = {0}; 
+    int accumulator = 0;
+    int instructionCounter = 0;
+    int instructionRegister = 0;
+    int operationCode = 0;
+    int operand = 0;
+    
+
+    cargarPrograma(memory);
+    ejecutarPrograma(memory, accumulator, instructionCounter, instructionRegister, operationCode, operand);
     dump(accumulator, instructionCounter, instructionRegister, operationCode, operand, memory);
 
     return 0;

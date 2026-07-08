@@ -14,3 +14,9 @@ BITÁCORA DE DESARROLLO - SIMULADOR SIMPLETRON
 --------------------------------------------------
 * Se modularizo la validacion de rangos mediante la funcion 'validarRango'.
 * Se agrego un ciclo de validacion en la operacion READ para asegurar que los datos ingresados en ejecucion no desborden la memoria.
+
+[2026-07-08] - Modificacion 1: Carga desde archivo y modularizacion
+--------------------------------------------------
+* Se reestructuro por completo el diseño de main.cpp dividiendo el flujo en funciones ('mostrarBienvenida', 'cargarPrograma', 'ejecutarPrograma').
+* Se implemento el Punto 1 (Objetivo SMART) para permitir la lectura automatica de instrucciones desde un archivo externo llamado 'programa.sml'.
+* Se añadio un mecanismo de respaldo interactivo por si el archivo no se encuentra en el directorio raíz.

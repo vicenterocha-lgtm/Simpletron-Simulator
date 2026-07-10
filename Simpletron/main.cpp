@@ -6,6 +6,9 @@
 using namespace std;
 
 
+const int TAMANO_MEMORIA = 1000;
+
+
 const int READ = 10;
 const int WRITE = 11;
 const int LOAD = 20;
@@ -46,7 +49,7 @@ void cargarPrograma(int memory[]) {
         int entrada = 0;
         int ubicacion = 0;
         
-        while (ubicacion < 100 && archivo >> entrada) {
+        while (ubicacion < TAMANO_MEMORIA && archivo >> entrada) {
             if (entrada == -99999) break;
             
             if (!validarRango(entrada)) {
@@ -65,8 +68,8 @@ void cargarPrograma(int memory[]) {
         
         int entrada = 0;
         int ubicacion = 0;
-        while (ubicacion < 100) {
-            cout << setfill('0') << setw(2) << ubicacion << " ? ";
+        while (ubicacion < TAMANO_MEMORIA) {
+            cout << setfill('0') << setw(3) << ubicacion << " ? ";
             cin >> entrada;
             if (entrada == -99999) break;
             
@@ -81,15 +84,17 @@ void cargarPrograma(int memory[]) {
     }
 }
 
-// Funcion para ejecutar el programa cargado en memoria
+
 void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, int& instructionRegister, int& operationCode, int& operand) {
     cout << "*** Comienza la ejecucion del programa ***\n\n";
     bool keepRunning = true;
     
     while (keepRunning) {
         instructionRegister = memory[instructionCounter];
-        operationCode = instructionRegister / 100;
-        operand = instructionRegister % 100;
+        
+
+        operationCode = instructionRegister / 1000;
+        operand = instructionRegister % 1000;
 
         switch (operationCode) {
             case READ: {
@@ -126,17 +131,32 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                 
             case ADD:
                 accumulator += memory[operand];
-                instructionCounter++;
+                if (!validarRango(accumulator)) {
+                    cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR (EJECUCION ABORTADA) ***\n";
+                    keepRunning = false;
+                } else {
+                    instructionCounter++;
+                }
                 break;
                 
             case SUBTRACT:
                 accumulator -= memory[operand];
-                instructionCounter++;
+                if (!validarRango(accumulator)) {
+                    cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR (EJECUCION ABORTADA) ***\n";
+                    keepRunning = false;
+                } else {
+                    instructionCounter++;
+                }
                 break;
                 
             case MULTIPLY:
                 accumulator *= memory[operand];
-                instructionCounter++;
+                if (!validarRango(accumulator)) {
+                    cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR (EJECUCION ABORTADA) ***\n";
+                    keepRunning = false;
+                } else {
+                    instructionCounter++;
+                }
                 break;
                 
             case DIVIDE:
@@ -174,7 +194,7 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                 break;
         }
 
-        if (instructionCounter < 0 || instructionCounter >= 100) {
+        if (instructionCounter < 0 || instructionCounter >= TAMANO_MEMORIA) {
             cout << "\n*** ERROR: CONTADOR DE INSTRUCCIONES FUERA DE RANGO ***\n";
             keepRunning = false;
         }
@@ -185,33 +205,32 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
 void dump(int accumulator, int instructionCounter, int instructionRegister, int operationCode, int operand, int memory[]) {
     cout << "\n*** REGISTROS ***\n";
     cout << "accumulator          " << setfill(' ') << setw(5) << internal << showpos << accumulator << endl;
-    cout << "instructionCounter   " << setfill('0') << setw(2) << noshowpos << instructionCounter << endl;
+    cout << "instructionCounter   " << setfill('0') << setw(3) << noshowpos << instructionCounter << endl;
     cout << "instructionRegister  " << setfill(' ') << setw(5) << internal << showpos << instructionRegister << endl;
     cout << "operationCode        " << setfill('0') << setw(2) << noshowpos << operationCode << endl;
-    cout << "operand              " << setfill('0') << setw(2) << noshowpos << operand << endl;
+    cout << "operand              " << setfill('0') << setw(3) << noshowpos << operand << endl;
 
-    cout << "\n*** MEMORIA ***\n       ";
-    for (int i = 0; i < 10; i++) cout << setw(5) << i << " ";
+    cout << "\n*** MEMORIA ***\n        ";
+    for (int i = 0; i < 10; i++) cout << setw(5) << i << "  ";
     cout << "\n";
 
-    for (int i = 0; i < 100; i += 10) {
-        cout << setw(3) << i << "  ";
+    for (int i = 0; i < TAMANO_MEMORIA; i += 10) {
+        cout << setfill('0') << setw(3) << i << "  ";
         for (int j = 0; j < 10; j++) {
-            cout << setfill(' ') << setw(5) << internal << showpos << memory[i + j] << " ";
+            cout << setfill(' ') << setw(5) << internal << showpos << memory[i + j] << "  ";
         }
         cout << "\n";
     }
 }
 
 int main() {
-    int memory[100] = {0}; 
+    int memory[TAMANO_MEMORIA] = {0}; 
     int accumulator = 0;
     int instructionCounter = 0;
     int instructionRegister = 0;
     int operationCode = 0;
     int operand = 0;
     
-
     cargarPrograma(memory);
     ejecutarPrograma(memory, accumulator, instructionCounter, instructionRegister, operationCode, operand);
     dump(accumulator, instructionCounter, instructionRegister, operationCode, operand, memory);

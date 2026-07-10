@@ -20,3 +20,9 @@ BITÁCORA DE DESARROLLO - SIMULADOR SIMPLETRON
 * Se reestructuro por completo el diseño de main.cpp dividiendo el flujo en funciones ('mostrarBienvenida', 'cargarPrograma', 'ejecutarPrograma').
 * Se implemento el Punto 1 (Objetivo SMART) para permitir la lectura automatica de instrucciones desde un archivo externo llamado 'programa.sml'.
 * Se añadio un mecanismo de respaldo interactivo por si el archivo no se encuentra en el directorio raíz.
+
+[2026-07-09] - Modificacion 2: Expansion de memoria a 1000 posiciones
+--------------------------------------------------
+* Se incremento el tamaño del arreglo de memoria de 100 a 1000 posiciones (0-999) cumpliendo el objetivo SMART.
+* Se recalculo el esquema de decodificacion de instrucciones SML para soportar operandos de 3 digitos mediante divisiones y residuos entre 1000.
+* Se ajustaron los controles de flujo y el formato visual de la funcion 'dump' para desplegar correctamente los registros y el mapa completo de memoria expandida.

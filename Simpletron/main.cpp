@@ -17,6 +17,7 @@ const int ADD = 30;
 const int SUBTRACT = 31;
 const int DIVIDE = 32;
 const int MULTIPLY = 33;
+const int MODULUS = 34; // Nueva operacion: Residuo (modulo)
 const int BRANCH = 40;
 const int BRANCHNEG = 41;
 const int BRANCHZERO = 42;
@@ -92,7 +93,6 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
     while (keepRunning) {
         instructionRegister = memory[instructionCounter];
         
-
         operationCode = instructionRegister / 1000;
         operand = instructionRegister % 1000;
 
@@ -151,89 +151,3 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                 
             case MULTIPLY:
                 accumulator *= memory[operand];
-                if (!validarRango(accumulator)) {
-                    cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR (EJECUCION ABORTADA) ***\n";
-                    keepRunning = false;
-                } else {
-                    instructionCounter++;
-                }
-                break;
-                
-            case DIVIDE:
-                if (memory[operand] == 0) {
-                    cout << "\n*** ERROR: DIVISION ENTRE CERO (EJECUCION ABORTADA) ***\n";
-                    keepRunning = false;
-                } else {
-                    accumulator /= memory[operand];
-                    instructionCounter++;
-                }
-                break;
-                
-            case BRANCH:
-                instructionCounter = operand;
-                break;
-                
-            case BRANCHNEG:
-                if (accumulator < 0) instructionCounter = operand;
-                else instructionCounter++;
-                break;
-                
-            case BRANCHZERO:
-                if (accumulator == 0) instructionCounter = operand;
-                else instructionCounter++;
-                break;
-                
-            case HALT:
-                cout << "\n*** Simpletron termina su ejecucion de forma limpia ***\n";
-                keepRunning = false;
-                break;
-                
-            default:
-                cout << "\n*** ERROR: CODIGO DE OPERACION INVALIDO ***\n";
-                keepRunning = false;
-                break;
-        }
-
-        if (instructionCounter < 0 || instructionCounter >= TAMANO_MEMORIA) {
-            cout << "\n*** ERROR: CONTADOR DE INSTRUCCIONES FUERA DE RANGO ***\n";
-            keepRunning = false;
-        }
-    }
-}
-
-
-void dump(int accumulator, int instructionCounter, int instructionRegister, int operationCode, int operand, int memory[]) {
-    cout << "\n*** REGISTROS ***\n";
-    cout << "accumulator          " << setfill(' ') << setw(5) << internal << showpos << accumulator << endl;
-    cout << "instructionCounter   " << setfill('0') << setw(3) << noshowpos << instructionCounter << endl;
-    cout << "instructionRegister  " << setfill(' ') << setw(5) << internal << showpos << instructionRegister << endl;
-    cout << "operationCode        " << setfill('0') << setw(2) << noshowpos << operationCode << endl;
-    cout << "operand              " << setfill('0') << setw(3) << noshowpos << operand << endl;
-
-    cout << "\n*** MEMORIA ***\n        ";
-    for (int i = 0; i < 10; i++) cout << setw(5) << i << "  ";
-    cout << "\n";
-
-    for (int i = 0; i < TAMANO_MEMORIA; i += 10) {
-        cout << setfill('0') << setw(3) << i << "  ";
-        for (int j = 0; j < 10; j++) {
-            cout << setfill(' ') << setw(5) << internal << showpos << memory[i + j] << "  ";
-        }
-        cout << "\n";
-    }
-}
-
-int main() {
-    int memory[TAMANO_MEMORIA] = {0}; 
-    int accumulator = 0;
-    int instructionCounter = 0;
-    int instructionRegister = 0;
-    int operationCode = 0;
-    int operand = 0;
-    
-    cargarPrograma(memory);
-    ejecutarPrograma(memory, accumulator, instructionCounter, instructionRegister, operationCode, operand);
-    dump(accumulator, instructionCounter, instructionRegister, operationCode, operand, memory);
-
-    return 0;
-}

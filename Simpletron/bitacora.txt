@@ -32,3 +32,9 @@ BITÁCORA DE DESARROLLO - SIMULADOR SIMPLETRON
 * Se integro una nueva instruccion aritmetica al decodificador SML: MODULUS (codigo de operacion 34).
 * Se implemento el comportamiento algoritmico para calcular el residuo matemático (A mod B) almacenando el resultado en el acumulador.
 * Se diseño e incorporo un manejo controlado de errores para detener la ejecucion del simulador de forma segura en caso de un intento de division entre cero.
+
+[2026-07-10] - Modificacion 4: Instruccion de Exponenciacion (Potencia)
+--------------------------------------------------
+* Se añadio la operacion EXPONENT (codigo de operacion 35) al conjunto de instrucciones SML del simulador.
+* Se implemento el calculo de potencias mediante un bucle de multiplicaciones sucesivas para controlar el desbordamiento de enteros en cada iteracion.
+* Se definieron validaciones de seguridad para detener de forma limpia el sistema si se detecta un exponente negativo o un desbordamiento en el acumulador.

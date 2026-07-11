@@ -44,3 +44,9 @@ BITÁCORA DE DESARROLLO - SIMULADOR SIMPLETRON
 * Se crearon e integraron las operaciones READSTRING (codigo de operacion 12) y WRITESTRING (codigo de operacion 13).
 * Se diseño el almacenamiento secuencial traduciendo caracteres a valores enteros ASCII dentro del vector de memoria.
 * Se implemento un valor nulo (0) como centinela final para delimitar el termino de las cadenas durante los procesos de lectura y escritura.
+
+[2026-07-11] - Modificacion 6: Formateo estructurado de cadenas en medias palabras ASCII
+--------------------------------------------------
+* Se rediseñaron las operaciones de procesamiento de texto dividiendo la estructura de datos en palabras segmentadas de dos grupos.
+* Se configuro el almacenamiento de la longitud de cadena desplazada por un factor de mil en la direccion base asignada.
+* Se implemento la conversion secuencial agregando el indice posicional en la mitad superior y el valor ASCII decimal en los tres digitos inferiores.

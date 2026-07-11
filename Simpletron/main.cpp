@@ -121,15 +121,19 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                 cout << "Ingrese una cadena de texto: ";
                 cin.ignore();
                 getline(cin, entradaString);
+                int longitud = entradaString.length();
                 int baseUbicacion = operand;
-                for (size_t i = 0; i < entradaString.length(); i++) {
+                if (baseUbicacion < TAMANO_MEMORIA) {
+                    memory[baseUbicacion] = longitud * 1000;
+                    baseUbicacion++;
+                }
+                for (int i = 0; i < longitud; i++) {
                     if (baseUbicacion < TAMANO_MEMORIA) {
-                        memory[baseUbicacion] = static_cast<int>(entradaString[i]);
+                        int grupoSuperior = (i + 1) * 1000;
+                        int grupoInferior = static_cast<int>(entradaString[i]);
+                        memory[baseUbicacion] = grupoSuperior + grupoInferior;
                         baseUbicacion++;
                     }
-                }
-                if (baseUbicacion < TAMANO_MEMORIA) {
-                    memory[baseUbicacion] = 0;
                 }
                 instructionCounter++;
                 break;
@@ -138,9 +142,16 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
             case WRITESTRING: {
                 int baseUbicacion = operand;
                 cout << "Salida de cadena: ";
-                while (baseUbicacion < TAMANO_MEMORIA && memory[baseUbicacion] != 0) {
-                    cout << static_cast<char>(memory[baseUbicacion]);
+                if (baseUbicacion < TAMANO_MEMORIA) {
+                    int longitud = memory[baseUbicacion] / 1000;
                     baseUbicacion++;
+                    for (int i = 0; i < longitud; i++) {
+                        if (baseUbicacion < TAMANO_MEMORIA) {
+                            int asciiValor = memory[baseUbicacion] % 1000;
+                            cout << static_cast<char>(asciiValor);
+                            baseUbicacion++;
+                        }
+                    }
                 }
                 cout << endl;
                 instructionCounter++;

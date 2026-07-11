@@ -38,3 +38,9 @@ BITÁCORA DE DESARROLLO - SIMULADOR SIMPLETRON
 * Se añadio la operacion EXPONENT (codigo de operacion 35) al conjunto de instrucciones SML del simulador.
 * Se implemento el calculo de potencias mediante un bucle de multiplicaciones sucesivas para controlar el desbordamiento de enteros en cada iteracion.
 * Se definieron validaciones de seguridad para detener de forma limpia el sistema si se detecta un exponente negativo o un desbordamiento en el acumulador.
+
+[2026-07-10] - Modificacion 5: Instrucciones para manejo de cadenas de caracteres
+--------------------------------------------------
+* Se crearon e integraron las operaciones READSTRING (codigo de operacion 12) y WRITESTRING (codigo de operacion 13).
+* Se diseño el almacenamiento secuencial traduciendo caracteres a valores enteros ASCII dentro del vector de memoria.
+* Se implemento un valor nulo (0) como centinela final para delimitar el termino de las cadenas durante los procesos de lectura y escritura.

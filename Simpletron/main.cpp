@@ -5,12 +5,12 @@
 
 using namespace std;
 
-
 const int TAMANO_MEMORIA = 1000;
-
 
 const int READ = 10;
 const int WRITE = 11;
+const int READSTRING = 12;
+const int WRITESTRING = 13;
 const int LOAD = 20;
 const int STORE = 21;
 const int ADD = 30;
@@ -18,12 +18,11 @@ const int SUBTRACT = 31;
 const int DIVIDE = 32;
 const int MULTIPLY = 33;
 const int MODULUS = 34;
-const int EXPONENT = 35; // Nueva operacion: Exponenciacion (potencia)
+const int EXPONENT = 35;
 const int BRANCH = 40;
 const int BRANCHNEG = 41;
 const int BRANCHZERO = 42;
 const int HALT = 43;
-
 
 bool validarRango(int valor) {
     if (valor < -9999 || valor > 9999) {
@@ -31,7 +30,6 @@ bool validarRango(int valor) {
     }
     return true;
 }
-
 
 void mostrarBienvenida() {
     cout << "*** Bienvenido a Simpletron! ***\n";
@@ -41,7 +39,6 @@ void mostrarBienvenida() {
     cout << "*** Entonces usted tecleara la palabra para esa ubicacion. ***\n";
     cout << "*** Teclee -99999 para terminar de introducir el programa. ***\n\n";
 }
-
 
 void cargarPrograma(int memory[]) {
     ifstream archivo("programa.sml");
@@ -86,7 +83,6 @@ void cargarPrograma(int memory[]) {
     }
 }
 
-
 void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, int& instructionRegister, int& operationCode, int& operand) {
     cout << "*** Comienza la ejecucion del programa ***\n\n";
     bool keepRunning = true;
@@ -119,6 +115,37 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                 cout << "Salida: " << memory[operand] << endl;
                 instructionCounter++;
                 break;
+
+            case READSTRING: {
+                string entradaString;
+                cout << "Ingrese una cadena de texto: ";
+                cin.ignore();
+                getline(cin, entradaString);
+                int baseUbicacion = operand;
+                for (size_t i = 0; i < entradaString.length(); i++) {
+                    if (baseUbicacion < TAMANO_MEMORIA) {
+                        memory[baseUbicacion] = static_cast<int>(entradaString[i]);
+                        baseUbicacion++;
+                    }
+                }
+                if (baseUbicacion < TAMANO_MEMORIA) {
+                    memory[baseUbicacion] = 0;
+                }
+                instructionCounter++;
+                break;
+            }
+
+            case WRITESTRING: {
+                int baseUbicacion = operand;
+                cout << "Salida de cadena: ";
+                while (baseUbicacion < TAMANO_MEMORIA && memory[baseUbicacion] != 0) {
+                    cout << static_cast<char>(memory[baseUbicacion]);
+                    baseUbicacion++;
+                }
+                cout << endl;
+                instructionCounter++;
+                break;
+            }
                 
             case LOAD:
                 accumulator = memory[operand];
@@ -241,7 +268,6 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
         }
     }
 }
-
 
 void dump(int accumulator, int instructionCounter, int instructionRegister, int operationCode, int operand, int memory[]) {
     cout << "\n*** REGISTROS ***\n";

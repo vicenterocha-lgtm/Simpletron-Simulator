@@ -112,11 +112,21 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
             }
                 
             case WRITE:
-                cout << "Salida: " << memory[operand] << endl;
-                instructionCounter++;
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION WRITE ***\n";
+                    keepRunning = false;
+                } else {
+                    cout << "Salida: " << memory[operand] << endl;
+                    instructionCounter++;
+                }
                 break;
 
             case READSTRING: {
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE BASE INVALIDA EN OPERACION READSTRING ***\n";
+                    keepRunning = false;
+                    break;
+                }
                 string entradaString;
                 cout << "Ingrese una cadena de texto: ";
                 cin.ignore();
@@ -140,6 +150,11 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
             }
 
             case WRITESTRING: {
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE BASE INVALIDA EN OPERACION WRITESTRING ***\n";
+                    keepRunning = false;
+                    break;
+                }
                 int baseUbicacion = operand;
                 cout << "Salida de cadena: ";
                 if (baseUbicacion < TAMANO_MEMORIA) {
@@ -150,75 +165,121 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                             int asciiValor = memory[baseUbicacion] % 1000;
                             cout << static_cast<char>(asciiValor);
                             baseUbicacion++;
+                        } else {
+                            cout << "\n*** ERROR: LECTURA DE CADENA EXGEDE EL LIMITE DE MEMORIA ***\n";
+                            keepRunning = false;
+                            break;
                         }
                     }
                 }
                 cout << endl;
-                instructionCounter++;
+                if (keepRunning) {
+                    instructionCounter++;
+                }
                 break;
             }
                 
             case LOAD:
-                accumulator = memory[operand];
-                instructionCounter++;
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION LOAD ***\n";
+                    keepRunning = false;
+                } else {
+                    accumulator = memory[operand];
+                    instructionCounter++;
+                }
                 break;
                 
             case STORE:
-                memory[operand] = accumulator;
-                instructionCounter++;
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION STORE ***\n";
+                    keepRunning = false;
+                } else {
+                    memory[operand] = accumulator;
+                    instructionCounter++;
+                }
                 break;
                 
             case ADD:
-                accumulator += memory[operand];
-                if (!validarRango(accumulator)) {
-                    cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR (EJECUCION ABORTADA) ***\n";
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION ADD ***\n";
                     keepRunning = false;
                 } else {
-                    instructionCounter++;
+                    accumulator += memory[operand];
+                    if (!validarRango(accumulator)) {
+                        cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR (EJECUCION ABORTADA) ***\n";
+                        keepRunning = false;
+                    } else {
+                        instructionCounter++;
+                    }
                 }
                 break;
                 
             case SUBTRACT:
-                accumulator -= memory[operand];
-                if (!validarRango(accumulator)) {
-                    cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR (EJECUCION ABORTADA) ***\n";
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION SUBTRACT ***\n";
                     keepRunning = false;
                 } else {
-                    instructionCounter++;
+                    accumulator -= memory[operand];
+                    if (!validarRango(accumulator)) {
+                        cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR (EJECUCION ABORTADA) ***\n";
+                        keepRunning = false;
+                    } else {
+                        instructionCounter++;
+                    }
                 }
                 break;
                 
             case MULTIPLY:
-                accumulator *= memory[operand];
-                if (!validarRango(accumulator)) {
-                    cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR (EJECUCION ABORTADA) ***\n";
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION MULTIPLY ***\n";
                     keepRunning = false;
                 } else {
-                    instructionCounter++;
+                    accumulator *= memory[operand];
+                    if (!validarRango(accumulator)) {
+                        cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR (EJECUCION ABORTADA) ***\n";
+                        keepRunning = false;
+                    } else {
+                        instructionCounter++;
+                    }
                 }
                 break;
                 
             case DIVIDE:
-                if (memory[operand] == 0) {
-                    cout << "\n*** ERROR: DIVISION ENTRE CERO (EJECUCION ABORTADA) ***\n";
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION DIVIDE ***\n";
                     keepRunning = false;
                 } else {
-                    accumulator /= memory[operand];
-                    instructionCounter++;
+                    if (memory[operand] == 0) {
+                        cout << "\n*** ERROR: DIVISION ENTRE CERO (EJECUCION ABORTADA) ***\n";
+                        keepRunning = false;
+                    } else {
+                        accumulator /= memory[operand];
+                        instructionCounter++;
+                    }
                 }
                 break;
 
             case MODULUS:
-                if (memory[operand] == 0) {
-                    cout << "\n*** ERROR: DIVISION ENTRE CERO EN OPERACION MODULO (EJECUCION ABORTADA) ***\n";
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION MODULO ***\n";
                     keepRunning = false;
                 } else {
-                    accumulator %= memory[operand];
-                    instructionCounter++;
+                    if (memory[operand] == 0) {
+                        cout << "\n*** ERROR: DIVISION ENTRE CERO EN OPERACION MODULO (EJECUCION ABORTADA) ***\n";
+                        keepRunning = false;
+                    } else {
+                        accumulator %= memory[operand];
+                        instructionCounter++;
+                    }
                 }
                 break;
 
             case EXPONENT: {
+                if (operand < 0 || operand >= TAMANO_MEMORIA) {
+                    cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION EXPONENT ***\n";
+                    keepRunning = false;
+                    break;
+                }
                 int base = accumulator;
                 int exponente = memory[operand];
                 

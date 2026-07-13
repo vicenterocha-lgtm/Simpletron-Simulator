@@ -56,3 +56,9 @@ BITÁCORA DE DESARROLLO - SIMULADOR SIMPLETRON
 * Se completo el ciclo de entrada y salida estructurada traduciendo secuencias numericas a caracteres individuales.
 * Se incorporaron validaciones de desbordamiento en indices de memoria para las operaciones basadas en cadenas de texto.
 * Se estructuro el manejo programado ante peticiones con direcciones invalidas o llamadas fuera de los limites de celdas configurados.
+
+[2026-07-13] - Modificacion Final (Checklist): Adaptacion para integracion con Compilador Simple
+--------------------------------------------------
+* Modificacion 1: Se cambio el formato de lectura de archivos automaticos de 'programa.sml' a 'programa.simp' para emparejar con el compilador.
+* Modificacion 5: Se agrego la instruccion NEWLINE (opcode 14) para emitir saltos de linea en consola y mejorar el formateo de salida.
+* Modificacion 8: Se reestructuro el simulador nativamente a Punto Flotante cambiando el arreglo de memoria, el acumulador y el registro de instrucciones a tipo 'double', integrando <cmath> para el manejo de operaciones con decimales y adaptando las conversiones para cadenas ASCII.

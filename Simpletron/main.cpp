@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <fstream>
 #include <string>
+#include <cmath>
 
 using namespace std;
 
@@ -11,6 +12,7 @@ const int READ = 10;
 const int WRITE = 11;
 const int READSTRING = 12;
 const int WRITESTRING = 13;
+const int NEWLINE = 14;
 const int LOAD = 20;
 const int STORE = 21;
 const int ADD = 30;
@@ -24,8 +26,8 @@ const int BRANCHNEG = 41;
 const int BRANCHZERO = 42;
 const int HALT = 43;
 
-bool validarRango(int valor) {
-    if (valor < -9999 || valor > 9999) {
+bool validarRango(double valor) {
+    if (valor < -9999.0 || valor > 9999.0) {
         return false;
     }
     return true;
@@ -40,12 +42,12 @@ void mostrarBienvenida() {
     cout << "*** Teclee -99999 para terminar de introducir el programa. ***\n\n";
 }
 
-void cargarPrograma(int memory[]) {
-    ifstream archivo("programa.sml");
+void cargarPrograma(double memory[]) {
+    ifstream archivo("programa.simp");
     
     if (archivo.is_open()) {
-        cout << "*** Cargando programa de forma automatica desde 'programa.sml'... ***\n";
-        int entrada = 0;
+        cout << "*** Cargando programa de forma automatica desde 'programa.simp'... ***\n";
+        double entrada = 0.0;
         int ubicacion = 0;
         
         while (ubicacion < TAMANO_MEMORIA && archivo >> entrada) {
@@ -62,10 +64,10 @@ void cargarPrograma(int memory[]) {
         archivo.close();
         cout << "*** Carga automatica desde archivo terminada con exito ***\n\n";
     } else {
-        cout << "--- Archivo 'programa.sml' no encontrado. Conservando carga interactiva linea por linea. ---\n\n";
+        cout << "--- Archivo 'programa.simp' no encontrado. Conservando carga interactiva linea por linea. ---\n\n";
         mostrarBienvenida();
         
-        int entrada = 0;
+        double entrada = 0.0;
         int ubicacion = 0;
         while (ubicacion < TAMANO_MEMORIA) {
             cout << setfill('0') << setw(3) << ubicacion << " ? ";
@@ -83,22 +85,22 @@ void cargarPrograma(int memory[]) {
     }
 }
 
-void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, int& instructionRegister, int& operationCode, int& operand) {
+void ejecutarPrograma(double memory[], double& accumulator, int& instructionCounter, double& instructionRegister, int& operationCode, int& operand) {
     cout << "*** Comienza la ejecucion del programa ***\n\n";
     bool keepRunning = true;
     
     while (keepRunning) {
         instructionRegister = memory[instructionCounter];
         
-        operationCode = instructionRegister / 1000;
-        operand = instructionRegister % 1000;
+        operationCode = static_cast<int>(instructionRegister) / 1000;
+        operand = static_cast<int>(instructionRegister) % 1000;
 
         switch (operationCode) {
             case READ: {
-                int valorEntrada = 0;
+                double valorEntrada = 0.0;
                 bool entradaValida = false;
                 while (!entradaValida) {
-                    cout << "Ingrese un entero (-9999 a +9999): ";
+                    cout << "Ingrese un numero (-9999 a +9999): ";
                     cin >> valorEntrada;
                     if (validarRango(valorEntrada)) {
                         memory[operand] = valorEntrada;
@@ -121,6 +123,11 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                 }
                 break;
 
+            case NEWLINE:
+                cout << "\n";
+                instructionCounter++;
+                break;
+
             case READSTRING: {
                 if (operand < 0 || operand >= TAMANO_MEMORIA) {
                     cout << "\n*** ERROR: DIRECCION DE BASE INVALIDA EN OPERACION READSTRING ***\n";
@@ -134,14 +141,14 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                 int longitud = entradaString.length();
                 int baseUbicacion = operand;
                 if (baseUbicacion < TAMANO_MEMORIA) {
-                    memory[baseUbicacion] = longitud * 1000;
+                    memory[baseUbicacion] = static_cast<double>(longitud * 1000);
                     baseUbicacion++;
                 }
                 for (int i = 0; i < longitud; i++) {
                     if (baseUbicacion < TAMANO_MEMORIA) {
                         int grupoSuperior = (i + 1) * 1000;
                         int grupoInferior = static_cast<int>(entradaString[i]);
-                        memory[baseUbicacion] = grupoSuperior + grupoInferior;
+                        memory[baseUbicacion] = static_cast<double>(grupoSuperior + grupoInferior);
                         baseUbicacion++;
                     }
                 }
@@ -158,11 +165,11 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                 int baseUbicacion = operand;
                 cout << "Salida de cadena: ";
                 if (baseUbicacion < TAMANO_MEMORIA) {
-                    int longitud = memory[baseUbicacion] / 1000;
+                    int longitud = static_cast<int>(memory[baseUbicacion]) / 1000;
                     baseUbicacion++;
                     for (int i = 0; i < longitud; i++) {
                         if (baseUbicacion < TAMANO_MEMORIA) {
-                            int asciiValor = memory[baseUbicacion] % 1000;
+                            int asciiValor = static_cast<int>(memory[baseUbicacion]) % 1000;
                             cout << static_cast<char>(asciiValor);
                             baseUbicacion++;
                         } else {
@@ -249,7 +256,7 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                     cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION DIVIDE ***\n";
                     keepRunning = false;
                 } else {
-                    if (memory[operand] == 0) {
+                    if (memory[operand] == 0.0) {
                         cout << "\n*** ERROR: DIVISION ENTRE CERO (EJECUCION ABORTADA) ***\n";
                         keepRunning = false;
                     } else {
@@ -264,11 +271,11 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                     cout << "\n*** ERROR: DIRECCION DE OPERANDO INVALIDA EN OPERACION MODULO ***\n";
                     keepRunning = false;
                 } else {
-                    if (memory[operand] == 0) {
+                    if (memory[operand] == 0.0) {
                         cout << "\n*** ERROR: DIVISION ENTRE CERO EN OPERACION MODULO (EJECUCION ABORTADA) ***\n";
                         keepRunning = false;
                     } else {
-                        accumulator %= memory[operand];
+                        accumulator = fmod(accumulator, memory[operand]);
                         instructionCounter++;
                     }
                 }
@@ -280,29 +287,16 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                     keepRunning = false;
                     break;
                 }
-                int base = accumulator;
-                int exponente = memory[operand];
                 
-                if (exponente < 0) {
+                if (memory[operand] < 0) {
                     cout << "\n*** ERROR: EXPONENTE NEGATIVO NO SOPORTADO (EJECUCION ABORTADA) ***\n";
                     keepRunning = false;
                 } else {
-                    long long resultado = 1;
-                    bool overflow = false;
-                    
-                    for (int i = 0; i < exponente; i++) {
-                        resultado *= base;
-                        if (resultado < -9999 || resultado > 9999) {
-                            overflow = true;
-                            break;
-                        }
-                    }
-                    
-                    if (overflow) {
+                    accumulator = pow(accumulator, memory[operand]);
+                    if (!validarRango(accumulator)) {
                         cout << "\n*** ERROR: DESBORDAMIENTO DEL ACUMULADOR EN EXPONENCIACION (EJECUCION ABORTADA) ***\n";
                         keepRunning = false;
                     } else {
-                        accumulator = static_cast<int>(resultado);
                         instructionCounter++;
                     }
                 }
@@ -314,12 +308,12 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
                 break;
                 
             case BRANCHNEG:
-                if (accumulator < 0) instructionCounter = operand;
+                if (accumulator < 0.0) instructionCounter = operand;
                 else instructionCounter++;
                 break;
                 
             case BRANCHZERO:
-                if (accumulator == 0) instructionCounter = operand;
+                if (accumulator == 0.0) instructionCounter = operand;
                 else instructionCounter++;
                 break;
                 
@@ -341,32 +335,32 @@ void ejecutarPrograma(int memory[], int& accumulator, int& instructionCounter, i
     }
 }
 
-void dump(int accumulator, int instructionCounter, int instructionRegister, int operationCode, int operand, int memory[]) {
+void dump(double accumulator, int instructionCounter, double instructionRegister, int operationCode, int operand, double memory[]) {
     cout << "\n*** REGISTROS ***\n";
-    cout << "accumulator          " << setfill(' ') << setw(5) << internal << showpos << accumulator << endl;
+    cout << "accumulator          " << setfill(' ') << setw(10) << internal << showpos << accumulator << endl;
     cout << "instructionCounter   " << setfill('0') << setw(3) << noshowpos << instructionCounter << endl;
-    cout << "instructionRegister  " << setfill(' ') << setw(5) << internal << showpos << instructionRegister << endl;
+    cout << "instructionRegister  " << setfill(' ') << setw(10) << internal << showpos << instructionRegister << endl;
     cout << "operationCode        " << setfill('0') << setw(2) << noshowpos << operationCode << endl;
     cout << "operand              " << setfill('0') << setw(3) << noshowpos << operand << endl;
 
     cout << "\n*** MEMORIA ***\n        ";
-    for (int i = 0; i < 10; i++) cout << setw(5) << i << "  ";
+    for (int i = 0; i < 10; i++) cout << setw(10) << i << "  ";
     cout << "\n";
 
     for (int i = 0; i < TAMANO_MEMORIA; i += 10) {
-        cout << setfill('0') << setw(3) << i << "  ";
+        cout << setfill('0') << setw(3) << noshowpos << i << "  ";
         for (int j = 0; j < 10; j++) {
-            cout << setfill(' ') << setw(5) << internal << showpos << memory[i + j] << "  ";
+            cout << setfill(' ') << setw(10) << internal << showpos << memory[i + j] << "  ";
         }
         cout << "\n";
     }
 }
 
 int main() {
-    int memory[TAMANO_MEMORIA] = {0}; 
-    int accumulator = 0;
+    double memory[TAMANO_MEMORIA] = {0.0}; 
+    double accumulator = 0.0;
     int instructionCounter = 0;
-    int instructionRegister = 0;
+    double instructionRegister = 0.0;
     int operationCode = 0;
     int operand = 0;
     

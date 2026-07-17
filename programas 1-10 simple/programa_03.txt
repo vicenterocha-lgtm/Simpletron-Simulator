@@ -1,0 +1,9 @@
+10 let suma = 0
+20 let conta = 1
+30 input num
+40 let suma = suma + num
+50 let conta = conta + 1
+60 if conta <= 7 goto 30
+70 let media = suma / 7
+80 print media
+90 end

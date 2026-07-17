@@ -1,0 +1,6 @@
+10 input base
+20 input altura
+30 let area = base * altura
+40 let area = area / 2
+50 print area
+60 end

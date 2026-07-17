@@ -1,0 +1,12 @@
+10 input total
+20 input mayor
+30 let conta = 1
+40 if conta == total goto 90
+50 input num
+60 let conta = conta + 1
+70 if num > mayor goto 80
+75 goto 40
+80 let mayor = num
+85 goto 40
+90 print mayor
+95 end

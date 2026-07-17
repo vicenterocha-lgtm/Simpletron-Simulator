@@ -1,0 +1,7 @@
+10 let prod = 1
+20 let i = 1
+30 let prod = prod * i
+40 let i = i + 2
+50 if i <= 9 goto 30
+60 print prod
+70 end

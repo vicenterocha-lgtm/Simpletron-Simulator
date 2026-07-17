@@ -1,0 +1,8 @@
+10 let suma = 0
+20 let contador = 1
+30 input num
+40 let suma = suma + num
+50 let contador = contador + 1
+60 if contador <= 10 goto 30
+70 print suma
+80 end

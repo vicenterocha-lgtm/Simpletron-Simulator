@@ -1,0 +1,55 @@
+========================================================================
+                 BITÁCORA DE DESARROLLO - COMPILADOR SIMPLE
+========================================================================
+
+------------------------------------------------------------------------
+FECHA: 13 de Julio de 2026
+ACTIVIDAD: Inicialización del Compilador y Estructura Base (Fase A y B)
+AUTOR: Vicente Rocha
+------------------------------------------------------------------------
+
+DESCRIPCIÓN DE LOS AVANCES:
+1. Definición del Esqueleto Léxico:
+   - Se diseñó la estructura inicial del archivo "main.cpp" dentro de la carpeta "Compilador".
+   - Se implementó la lectura básica del archivo fuente "programa.simp" para cargar las instrucciones en memoria de compilación.
+
+2. Creación de la Estructura de Tokens (Analizador Léxico - Fase A):
+   - Se estructuró el tipo de datos "Token" utilizando un struct que clasifica el flujo de caracteres bajo dos propiedades esenciales: "tipo" y "valor".
+   - Se identificaron los tipos de tokens requeridos para el lenguaje Simple: NUM_LINEA, COMANDO, VARIABLE, CONSTANTE y OPERADOR.
+
+3. Esbozo de la Tabla de Símbolos (Primera Pasada - Fase B):
+   - Se conceptualizó la necesidad de una tabla que asocie símbolos (variables, constantes y números de línea) con sus correspondientes direcciones de memoria física de Simpletron.
+   - Se estructuró el flujo para separar las áreas de asignación de memoria: las instrucciones se asignarán desde la dirección 000 en adelante, mientras que las variables y constantes se ubicarán desde la dirección 999 de forma descendente para evitar colisiones.
+
+PRÓXIMOS PASOS:
+- Implementar la lógica del analizador léxico (tokenizar) para leer y clasificar cadenas en el archivo fuente de forma automatizada.
+- Desarrollar la lógica de la "Primera Pasada" para llenar físicamente la Tabla de Símbolos a partir de los tokens obtenidos.
+- Diseñar y programar el motor de resolución para la "Segunda Pasada" (Fase C) que traduzca las instrucciones clasificadas a formato numérico SML.
+
+========================================================================
+
+------------------------------------------------------------------------
+FECHA: 16 de Julio de 2026
+ACTIVIDAD: Integración y Finalización del Compilador de Dos Pasadas
+AUTOR: Vicente Rocha
+------------------------------------------------------------------------
+
+DESCRIPCIÓN DE LOS AVANCES:
+1. Implementación del Analizador Léxico (Fase A):
+   - Se completó la función de tokenización para descomponer las expresiones de código plano en palabras clave (Comandos, Variables, Constantes y Operadores).
+
+2. Vinculación de la Tabla de Símbolos (Fase B):
+   - Se desarrolló el sistema de almacenamiento dinámico que gestiona variables (desde la celda de memoria 999 de manera descendente) y números de línea vinculados a su bloque de ejecución (desde la celda 000 de manera ascendente).
+
+3. Motor de Traducción de la Segunda Pasada (Fase C):
+   - Se diseñó y programó la lógica de ensamblado que traduce instrucciones del lenguaje Simple a código máquina SML (Simpletron Machine Language).
+   - El traductor procesa correctamente instrucciones fundamentales como: INPUT, PRINT, LET, GOTO, IF y END.
+   - Traduce condicionales relacionales (==, <=, <) mediante sustracción en el acumulador y saltos basados en condiciones de cero y negativo (BRANCHZERO, BRANCHNEG).
+
+4. Exportación SML:
+   - Se programó la escritura automatizada del compilador en un archivo de salida formateado con el sufijo ".sml" listo para ser leído y ejecutado directamente por la máquina virtual Simpletron.
+
+ESTADO DEL PROYECTO:
+- Compilador 100% funcional y listo para la validación con los 10 programas de prueba estandarizados.
+
+========================================================================

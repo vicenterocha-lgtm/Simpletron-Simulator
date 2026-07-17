@@ -1,0 +1,6 @@
+10 input c
+20 let f = c * 9
+30 let f = f / 5
+40 let f = f + 32
+50 print f
+60 end

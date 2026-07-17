@@ -1,0 +1,10 @@
+10 input menor
+20 let conta = 1
+30 input num
+40 let conta = conta + 1
+50 if num < menor goto 70
+60 goto 80
+70 let menor = num
+80 if conta <= 9 goto 30
+90 print menor
+100 end

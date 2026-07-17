@@ -1,0 +1,7 @@
+10 input num
+20 let conta = 1
+30 let res = num * conta
+40 print res
+50 let conta = conta + 1
+60 if conta <= 10 goto 30
+70 end

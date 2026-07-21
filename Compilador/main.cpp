@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <cctype>
 #include <algorithm>
+#include <stack>
 
 using namespace std;
 
@@ -16,7 +17,7 @@ struct Token {
 
 struct EntradaTabla {
     string simbolo;
-    char tipo;
+    char tipo; // 'L' = Linea, 'V' = Variable, 'C' = Constante
     int ubicacion;
 };
 
@@ -57,6 +58,43 @@ private:
         return true;
     }
 
+    int precedencia(const string& op) {
+        if (op == "^") return 3;
+        if (op == "*" || op == "/" || op == "%") return 2;
+        if (op == "+" || op == "-") return 1;
+        return 0;
+    }
+
+    vector<string> infijoAPostfijo(const vector<string>& tokensExpr) {
+        vector<string> postfijo;
+        stack<string> pila;
+
+        for (const string& token : tokensExpr) {
+            if (esNumero(token) || (isalpha(token[0]) && token.size() == 1)) {
+                postfijo.push_back(token);
+            } else if (token == "(") {
+                pila.push(token);
+            } else if (token == ")") {
+                while (!pila.empty() && pila.top() != "(") {
+                    postfijo.push_back(pila.top());
+                    pila.pop();
+                }
+                if (!pila.empty()) pila.pop();
+            } else { 
+                while (!pila.empty() && precedencia(pila.top()) >= precedencia(token)) {
+                    postfijo.push_back(pila.top());
+                    pila.pop();
+                }
+                pila.push(token);
+            }
+        }
+        while (!pila.empty()) {
+            postfijo.push_back(pila.top());
+            pila.pop();
+        }
+        return postfijo;
+    }
+
 public:
     Compilador() {
         instruccionCounter = 0;
@@ -86,7 +124,8 @@ public:
                     t.valor = palabra;
                 } else if (palabra == "+" || palabra == "-" || palabra == "*" || palabra == "/" || 
                            palabra == "%" || palabra == "^" || palabra == "=" || palabra == "==" || 
-                           palabra == "<=" || palabra == ">=" || palabra == "<" || palabra == ">") {
+                           palabra == "<=" || palabra == ">=" || palabra == "<" || palabra == ">" ||
+                           palabra == "(" || palabra == ")") {
                     t.tipo = "OPERADOR";
                     t.valor = palabra;
                 } else if (esNumero(palabra)) {
@@ -101,27 +140,72 @@ public:
         }
     }
 
-    void primeraPasada() {
-        for (size_t i = 0; i < tokens.size(); i++) {
-            if (tokens[i].tipo == "NUM_LINEA") {
-                agregarSimbolo(tokens[i].valor, 'L', instruccionCounter);
-                instruccionCounter++; 
-            } 
-            else if (tokens[i].tipo == "VARIABLE") {
-                if (buscarSimbolo(tokens[i].valor, 'V') == -1) {
-                    agregarSimbolo(tokens[i].valor, 'V', dataCounter);
-                    dataCounter--;
+    void primeraPasada(const string& codigoCompleto) {
+        stringstream ss(codigoCompleto);
+        string linea;
+        int pcContador = 0;
+
+        while (getline(ss, linea)) {
+            if (linea.empty()) continue;
+            stringstream streamLinea(linea);
+            string numLinea, comando;
+            if (!(streamLinea >> numLinea >> comando)) continue;
+
+            agregarSimbolo(numLinea, 'L', pcContador);
+
+            if (comando == "rem") {
+                // REM no genera instrucciones SML
+            } else if (comando == "input" || comando == "print" || comando == "goto" || comando == "end") {
+                pcContador += 1;
+            } else if (comando == "let") {
+                string varDestino, igual;
+                streamLinea >> varDestino >> igual;
+                vector<string> exprTokens;
+                string t;
+                while (streamLinea >> t) exprTokens.push_back(t);
+
+                if (exprTokens.size() == 1) {
+                    pcContador += 2; // LOAD, STORE
+                } else if (exprTokens.size() == 3) {
+                    pcContador += 3; // LOAD, OP, STORE
+                } else {
+                    vector<string> post = infijoAPostfijo(exprTokens);
+                    int ops = 0;
+                    for (const auto& tk : post) {
+                        if (tk == "+" || tk == "-" || tk == "*" || tk == "/" || tk == "%" || tk == "^") ops++;
+                    }
+                    pcContador += 1 + ops + 1;
                 }
-            } 
-            else if (tokens[i].tipo == "CONSTANTE") {
-                if (buscarSimbolo(tokens[i].valor, 'C') == -1) {
-                    agregarSimbolo(tokens[i].valor, 'C', dataCounter);
-                    memoriaSML[dataCounter] = stoi(tokens[i].valor);
-                    dataCounter--;
+            } else if (comando == "if") {
+                string op1, rel, op2, gotoCmd, dest;
+                streamLinea >> op1 >> rel >> op2 >> gotoCmd >> dest;
+                if (rel == "==" || rel == "<" || rel == ">") {
+                    pcContador += 3; 
+                } else if (rel == "<=" || rel == ">=") {
+                    pcContador += 4; 
+                }
+            }
+
+            string tokenAux;
+            stringstream streamLinea2(linea);
+            streamLinea2 >> numLinea;
+            while (streamLinea2 >> tokenAux) {
+                if (esNumero(tokenAux) && tokenAux != numLinea) {
+                    if (buscarSimbolo(tokenAux, 'C') == -1) {
+                        agregarSimbolo(tokenAux, 'C', dataCounter);
+                        memoriaSML[dataCounter] = stoi(tokenAux);
+                        dataCounter--;
+                    }
+                } else if (isalpha(tokenAux[0]) && tokenAux.size() == 1) {
+                    if (buscarSimbolo(tokenAux, 'V') == -1) {
+                        agregarSimbolo(tokenAux, 'V', dataCounter);
+                        dataCounter--;
+                    }
                 }
             }
         }
-        cout << "[OK] Primera Pasada: Tabla de Simbolos generada.\n";
+        instruccionCounter = pcContador;
+        cout << "[OK] Primera Pasada: Tabla de Simbolos calculada correctamente.\n";
     }
 
     void segundaPasada(const string& codigoCompleto) {
@@ -133,76 +217,70 @@ public:
             if (linea.empty()) continue;
             stringstream streamLinea(linea);
             string etiqueta, comando;
-            streamLinea >> etiqueta >> comando;
+            if (!(streamLinea >> etiqueta >> comando)) continue;
 
             if (comando == "rem") {
-                memoriaSML[pc] = 0;
-                pc++;
+                continue;
             }
             else if (comando == "input") {
                 string var;
                 streamLinea >> var;
                 int dirVar = buscarSimbolo(var, 'V');
-                memoriaSML[pc] = 10 * 1000 + dirVar;
-                pc++;
+                memoriaSML[pc++] = 10 * 1000 + dirVar;
             }
             else if (comando == "print") {
                 string var;
                 streamLinea >> var;
                 int dirVar = buscarSimbolo(var, 'V');
                 if (dirVar == -1) dirVar = buscarSimbolo(var, 'C');
-                memoriaSML[pc] = 11 * 1000 + dirVar;
-                pc++;
+                memoriaSML[pc++] = 11 * 1000 + dirVar;
             }
             else if (comando == "goto") {
                 string destino;
                 streamLinea >> destino;
                 int dirDestino = buscarSimbolo(destino, 'L');
-                memoriaSML[pc] = 40 * 1000 + dirDestino;
-                pc++;
+                memoriaSML[pc++] = 40 * 1000 + dirDestino;
             }
             else if (comando == "end") {
-                memoriaSML[pc] = 43 * 1000;
-                pc++;
+                memoriaSML[pc++] = 43 * 1000;
             }
             else if (comando == "let") {
-                string varDestino, igual, operando1, op, operando2;
-                streamLinea >> varDestino >> igual >> operando1;
-                
+                string varDestino, igual;
+                streamLinea >> varDestino >> igual;
                 int dirDest = buscarSimbolo(varDestino, 'V');
-                int dirOp1 = buscarSimbolo(operando1, 'V');
-                if (dirOp1 == -1) dirOp1 = buscarSimbolo(operando1, 'C');
 
-                if (streamLinea >> op >> operando2) {
-                    int dirOp2 = buscarSimbolo(operando2, 'V');
-                    if (dirOp2 == -1) dirOp2 = buscarSimbolo(operando2, 'C');
+                vector<string> exprTokens;
+                string t;
+                while (streamLinea >> t) exprTokens.push_back(t);
 
-                    memoriaSML[pc] = 20 * 1000 + dirOp1;
-                    pc++;
+                if (exprTokens.size() == 1) {
+                    int dirOp = buscarSimbolo(exprTokens[0], 'V');
+                    if (dirOp == -1) dirOp = buscarSimbolo(exprTokens[0], 'C');
+                    memoriaSML[pc++] = 20 * 1000 + dirOp; // LOAD
+                    memoriaSML[pc++] = 21 * 1000 + dirDest; // STORE
+                } 
+                else if (exprTokens.size() == 3) {
+                    int dirOp1 = buscarSimbolo(exprTokens[0], 'V');
+                    if (dirOp1 == -1) dirOp1 = buscarSimbolo(exprTokens[0], 'C');
+                    int dirOp2 = buscarSimbolo(exprTokens[2], 'V');
+                    if (dirOp2 == -1) dirOp2 = buscarSimbolo(exprTokens[2], 'C');
 
-                    if (op == "+") {
-                        memoriaSML[pc] = 30 * 1000 + dirOp2;
-                    } else if (op == "-") {
-                        memoriaSML[pc] = 31 * 1000 + dirOp2;
-                    } else if (op == "*") {
-                        memoriaSML[pc] = 33 * 1000 + dirOp2;
-                    } else if (op == "/") {
-                        memoriaSML[pc] = 32 * 1000 + dirOp2;
-                    }
-                    pc++;
+                    memoriaSML[pc++] = 20 * 1000 + dirOp1; // LOAD
 
-                    memoriaSML[pc] = 21 * 1000 + dirDest;
-                    pc++;
-                } else {
-                    memoriaSML[pc] = 20 * 1000 + dirOp1;
-                    pc++;
-                    memoriaSML[pc] = 21 * 1000 + dirDest;
-                    pc++;
+                    string op = exprTokens[1];
+                    if (op == "+") memoriaSML[pc++] = 30 * 1000 + dirOp2;
+                    else if (op == "-") memoriaSML[pc++] = 31 * 1000 + dirOp2;
+                    else if (op == "*") memoriaSML[pc++] = 33 * 1000 + dirOp2;
+                    else if (op == "/") memoriaSML[pc++] = 32 * 1000 + dirOp2;
+                    else if (op == "%") memoriaSML[pc++] = 34 * 1000 + dirOp2;
+                    else if (op == "^") memoriaSML[pc++] = 35 * 1000 + dirOp2;
+
+                    memoriaSML[pc++] = 21 * 1000 + dirDest; // STORE
                 }
             }
             else if (comando == "if") {
-                string op1, rel, op2, goto_cmd, destino;
-                streamLinea >> op1 >> rel >> op2 >> goto_cmd >> destino;
+                string op1, rel, op2, gotoCmd, destino;
+                streamLinea >> op1 >> rel >> op2 >> gotoCmd >> destino;
 
                 int dirOp1 = buscarSimbolo(op1, 'V');
                 if (dirOp1 == -1) dirOp1 = buscarSimbolo(op1, 'C');
@@ -212,25 +290,27 @@ public:
 
                 int dirDest = buscarSimbolo(destino, 'L');
 
-                memoriaSML[pc] = 20 * 1000 + dirOp1;
-                pc++;
-                memoriaSML[pc] = 31 * 1000 + dirOp2;
-                pc++;
+                memoriaSML[pc++] = 20 * 1000 + dirOp1; 
+                memoriaSML[pc++] = 31 * 1000 + dirOp2; 
 
                 if (rel == "==") {
-                    memoriaSML[pc] = 42 * 1000 + dirDest;
-                    pc++;
+                    memoriaSML[pc++] = 42 * 1000 + dirDest; 
                 } else if (rel == "<") {
-                    memoriaSML[pc] = 41 * 1000 + dirDest;
-                    pc++;
-                } else if (rel == "<=") {
-                    memoriaSML[pc] = 41 * 1000 + dirDest;
-                    pc++;
-                    memoriaSML[pc] = 42 * 1000 + dirDest;
-                    pc++;
+                    memoriaSML[pc++] = 41 * 1000 + dirDest; 
                 } else if (rel == ">") {
-                    memoriaSML[pc] = 40 * 1000 + dirDest;
-                    pc++;
+                    pc--; 
+                    memoriaSML[pc - 1] = 20 * 1000 + dirOp2; 
+                    memoriaSML[pc++] = 31 * 1000 + dirOp1;   
+                    memoriaSML[pc++] = 41 * 1000 + dirDest;  
+                } else if (rel == "<=") {
+                    memoriaSML[pc++] = 41 * 1000 + dirDest; 
+                    memoriaSML[pc++] = 42 * 1000 + dirDest; 
+                } else if (rel == ">=") {
+                    pc--;
+                    memoriaSML[pc - 1] = 20 * 1000 + dirOp2;
+                    memoriaSML[pc++] = 31 * 1000 + dirOp1;
+                    memoriaSML[pc++] = 41 * 1000 + dirDest;
+                    memoriaSML[pc++] = 42 * 1000 + dirDest;
                 }
             }
         }
@@ -244,11 +324,11 @@ public:
                 if (i < instruccionCounter || i > dataCounter) {
                     salida << setfill('0') << setw(3) << i << " " 
                            << (memoriaSML[i] >= 0 ? "+" : "-") 
-                           << setfill('0') << setw(5) << abs(memoriaSML[i]) << "\n";
+                           << setfill('0') << setw(4) << abs(memoriaSML[i]) << "\n";
                 }
             }
             salida.close();
-            cout << "[OK] Archivo binario/SML generado: " << nombreArchivo << "\n";
+            cout << "[OK] Archivo SML generado: " << nombreArchivo << "\n";
         }
     }
 };
@@ -269,7 +349,7 @@ int main() {
         
         Compilador compiler;
         compiler.tokenizar(codigoCompleto);
-        compiler.primeraPasada();
+        compiler.primeraPasada(codigoCompleto);
         compiler.segundaPasada(codigoCompleto);
         compiler.exportarSML(nombreSalida);
         

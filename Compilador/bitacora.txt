@@ -53,3 +53,14 @@ ESTADO DEL PROYECTO:
 - Compilador 100% funcional y listo para la validación con los 10 programas de prueba estandarizados.
 
 ========================================================================
+
+======================================================
+FECHA: Finalización de Proyecto
+ACTIVIDAD: Corrección final y optimización del Compilador (main.cpp)
+DETALLES:
+- Corregido el cálculo del instructionCounter en la primera pasada para que considere el número real de instrucciones SML por comando (GOTO, IF, LET, etc.).
+- Corregida la traducción de comparaciones relacionales en la instrucción IF (>, <, ==, <=, >=).
+- Añadido soporte de conversión infijo a postfijo mediante pila para la evaluación de expresiones aritméticas compuestas en sentencias LET.
+- Verificada la coherencia entre las direcciones de la Tabla de Símbolos y los saltos condicionales/incondicionales en SML.
+ESTADO: Proyecto finalizado al 100% y listo para entrega.
+======================================================

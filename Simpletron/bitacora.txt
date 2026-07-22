@@ -10,55 +10,63 @@ BITÁCORA DE DESARROLLO - SIMULADOR SIMPLETRON
   - Diseñar la interfaz de carga de instrucciones.
   - Implementar la validación del rango de operaciones en memoria.
 
-[2026-07-07] - Proteccion de memoria y entrada de datos
+[2026-07-07] - Protección de memoria y entrada de datos
 --------------------------------------------------
-* Se modularizo la validacion de rangos mediante la funcion 'validarRango'.
-* Se agrego un ciclo de validacion en la operacion READ para asegurar que los datos ingresados en ejecucion no desborden la memoria.
+* Se modularizó la validación de rangos mediante la función 'validarRango'.
+* Se agregó un ciclo de validación en la operación READ para asegurar que los datos ingresados en ejecución no desborden la memoria.
 
-[2026-07-08] - Modificacion 1: Carga desde archivo y modularizacion
+[2026-07-08] - Modificación 1: Carga desde archivo y modularización
 --------------------------------------------------
-* Se reestructuro por completo el diseño de main.cpp dividiendo el flujo en funciones ('mostrarBienvenida', 'cargarPrograma', 'ejecutarPrograma').
-* Se implemento el Punto 1 (Objetivo SMART) para permitir la lectura automatica de instrucciones desde un archivo externo llamado 'programa.sml'.
-* Se añadio un mecanismo de respaldo interactivo por si el archivo no se encuentra en el directorio raíz.
+* Se reestructuró por completo el diseño de main.cpp dividiendo el flujo en funciones ('mostrarBienvenida', 'cargarPrograma', 'ejecutarPrograma').
+* Se implementó el Punto 1 (Objetivo SMART) para permitir la lectura automática de instrucciones desde un archivo externo llamado 'programa.sml'.
+* Se añadió un mecanismo de respaldo interactivo por si el archivo no se encuentra en el directorio raíz.
 
-[2026-07-09] - Modificacion 2: Expansion de memoria a 1000 posiciones
+[2026-07-09] - Modificación 2: Expansión de memoria a 1000 posiciones
 --------------------------------------------------
-* Se incremento el tamaño del arreglo de memoria de 100 a 1000 posiciones (0-999) cumpliendo el objetivo SMART.
-* Se recalculo el esquema de decodificacion de instrucciones SML para soportar operandos de 3 digitos mediante divisiones y residuos entre 1000.
-* Se ajustaron los controles de flujo y el formato visual de la funcion 'dump' para desplegar correctamente los registros y el mapa completo de memoria expandida.
+* Se incrementó el tamaño del arreglo de memoria de 100 a 1000 posiciones (0-999) cumpliendo el objetivo SMART.
+* Se recalculó el esquema de decodificación de instrucciones SML para soportar operandos de 3 dígitos mediante divisiones y residuos entre 1000.
+* Se ajustaron los controles de flujo y el formato visual de la función 'dump' para desplegar correctamente los registros y el mapa completo de memoria expandida.
 
-[2026-07-10] - Modificacion 3: Instruccion de Residuo (Módulo)
+[2026-07-10] - Modificación 3: Instrucción de Residuo (Módulo)
 --------------------------------------------------
-* Se integro una nueva instruccion aritmetica al decodificador SML: MODULUS (codigo de operacion 34).
-* Se implemento el comportamiento algoritmico para calcular el residuo matemático (A mod B) almacenando el resultado en el acumulador.
-* Se diseño e incorporo un manejo controlado de errores para detener la ejecucion del simulador de forma segura en caso de un intento de division entre cero.
+* Se integró una nueva instrucción aritmética al decodificador SML: MODULUS (código de operación 34).
+* Se implementó el comportamiento algorítmico para calcular el residuo matemático (A mod B) almacenando el resultado en el acumulador.
+* Se diseñó e incorporó un manejo controlado de errores para detener la ejecución del simulador de forma segura en caso de un intento de división entre cero.
 
-[2026-07-10] - Modificacion 4: Instruccion de Exponenciacion (Potencia)
+[2026-07-10] - Modificación 4: Instrucción de Exponenciación (Potencia)
 --------------------------------------------------
-* Se añadio la operacion EXPONENT (codigo de operacion 35) al conjunto de instrucciones SML del simulador.
-* Se implemento el calculo de potencias mediante un bucle de multiplicaciones sucesivas para controlar el desbordamiento de enteros en cada iteracion.
+* Se añadió la operación EXPONENT (código de operación 35) al conjunto de instrucciones SML del simulador.
+* Se implementó el cálculo de potencias mediante un bucle de multiplicaciones sucesivas para controlar el desbordamiento de enteros en cada iteración.
 * Se definieron validaciones de seguridad para detener de forma limpia el sistema si se detecta un exponente negativo o un desbordamiento en el acumulador.
 
-[2026-07-10] - Modificacion 5: Instrucciones para manejo de cadenas de caracteres
+[2026-07-10] - Modificación 5: Instrucciones para manejo de cadenas de caracteres
 --------------------------------------------------
-* Se crearon e integraron las operaciones READSTRING (codigo de operacion 12) y WRITESTRING (codigo de operacion 13).
-* Se diseño el almacenamiento secuencial traduciendo caracteres a valores enteros ASCII dentro del vector de memoria.
-* Se implemento un valor nulo (0) como centinela final para delimitar el termino de las cadenas durante los procesos de lectura y escritura.
+* Se crearon e integraron las operaciones READSTRING (código de operación 12) y WRITESTRING (código de operación 13).
+* Se diseñó el almacenamiento secuencial traduciendo caracteres a valores enteros ASCII dentro del vector de memoria.
+* Se implementó un valor nulo (0) como centinela final para delimitar el término de las cadenas durante los procesos de lectura y escritura.
 
-[2026-07-11] - Modificacion 6: Formateo estructurado de cadenas en medias palabras ASCII
+[2026-07-11] - Modificación 6: Formateo estructurado de cadenas en medias palabras ASCII
 --------------------------------------------------
 * Se rediseñaron las operaciones de procesamiento de texto dividiendo la estructura de datos en palabras segmentadas de dos grupos.
-* Se configuro el almacenamiento de la longitud de cadena desplazada por un factor de mil en la direccion base asignada.
-* Se implemento la conversion secuencial agregando el indice posicional en la mitad superior y el valor ASCII decimal en los tres digitos inferiores.
+* Se configuró el almacenamiento de la longitud de cadena desplazada por un factor de mil en la dirección base asignada.
+* Se implementó la conversión secuencial agregando el índice posicional en la mitad superior y el valor ASCII decimal en los tres dígitos inferiores.
 
-[2026-07-11] - Modificacion 7: Control de excepciones en salida y lectura secuencial de cadenas
+[2026-07-11] - Modificación 7: Control de excepciones en salida y lectura secuencial de cadenas
 --------------------------------------------------
-* Se completo el ciclo de entrada y salida estructurada traduciendo secuencias numericas a caracteres individuales.
-* Se incorporaron validaciones de desbordamiento en indices de memoria para las operaciones basadas en cadenas de texto.
-* Se estructuro el manejo programado ante peticiones con direcciones invalidas o llamadas fuera de los limites de celdas configurados.
+* Se completó el ciclo de entrada y salida estructurada traduciendo secuencias numéricas a caracteres individuales.
+* Se incorporaron validaciones de desbordamiento en índices de memoria para las operaciones basadas en cadenas de texto.
+* Se estructuró el manejo programado ante peticiones con direcciones inválidas o llamadas fuera de los límites de celdas configurados.
 
-[2026-07-13] - Modificacion Final (Checklist): Adaptacion para integracion con Compilador Simple
+[2026-07-13] - Modificación 8 (Checklist): Adaptación para integración con Compilador Simple
 --------------------------------------------------
-* Modificacion 1: Se cambio el formato de lectura de archivos automaticos de 'programa.sml' a 'programa.simp' para emparejar con el compilador.
-* Modificacion 5: Se agrego la instruccion NEWLINE (opcode 14) para emitir saltos de linea en consola y mejorar el formateo de salida.
-* Modificacion 8: Se reestructuro el simulador nativamente a Punto Flotante cambiando el arreglo de memoria, el acumulador y el registro de instrucciones a tipo 'double', integrando <cmath> para el manejo de operaciones con decimales y adaptando las conversiones para cadenas ASCII.
+* Modificación 1: Se cambió el formato de lectura de archivos automáticos de 'programa.sml' a 'programa.simp' para emparejar con el compilador.
+* Modificación 5: Se agregó la instrucción NEWLINE (opcode 14) para emitir saltos de línea en consola y mejorar el formateo de salida.
+* Modificación 8: Se reestructuró el simulador nativamente a Punto Flotante cambiando el arreglo de memoria, el acumulador y el registro de instrucciones a tipo 'double', integrando <cmath> para el manejo de operaciones con decimales y adaptando las conversiones para cadenas ASCII.
+
+[2026-07-21] - Ajuste Final: Optimización de Parser SML y soporte de 5 dígitos
+--------------------------------------------------
+* Se perfeccionó la rutina de parseo en 'main.cpp' para ignorar dinámicamente las direcciones prefijadas (ej. "0000 +30005") al leer 'programa.sml'.
+* Se amplió el rango de decodificación y entrada para procesar de forma nativa operandos de 5 dígitos/3 dígitos de dirección sin alterar las posiciones de memoria.
+* Se integraron y validaron los cambios en la rama principal ('main') sincronizándolo con el compilador de 2 pasadas.
+* Se incluyeron capturas de prueba de ejecución en la carpeta 'evidencias/' dentro del repositorio.
+* ESTADO: Módulo finalizado al 100% y verificado para entrega final.

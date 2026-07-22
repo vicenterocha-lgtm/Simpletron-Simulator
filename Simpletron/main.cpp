@@ -27,7 +27,7 @@ const int BRANCHZERO = 42;
 const int HALT = 43;
 
 bool validarRango(double valor) {
-    if (valor < -9999.0 || valor > 9999.0) {
+    if (valor < -99999.0 || valor > 99999.0) {
         return false;
     }
     return true;
@@ -43,14 +43,19 @@ void mostrarBienvenida() {
 }
 
 void cargarPrograma(double memory[]) {
-    ifstream archivo("programa.simp");
+    ifstream archivo("../programa.sml");
+    if (!archivo.is_open()) {
+        archivo.open("programa.sml");
+    }
     
     if (archivo.is_open()) {
-        cout << "*** Cargando programa de forma automatica desde 'programa.simp'... ***\n";
+        cout << "*** Cargando programa de forma automatica desde 'programa.sml'... ***\n";
         double entrada = 0.0;
+        int direccionDummy = 0;
         int ubicacion = 0;
         
-        while (ubicacion < TAMANO_MEMORIA && archivo >> entrada) {
+        // Lee primero la dirección (000) y luego la instrucción (+10999)
+        while (ubicacion < TAMANO_MEMORIA && archivo >> direccionDummy >> entrada) {
             if (entrada == -99999) break;
             
             if (!validarRango(entrada)) {
@@ -64,7 +69,7 @@ void cargarPrograma(double memory[]) {
         archivo.close();
         cout << "*** Carga automatica desde archivo terminada con exito ***\n\n";
     } else {
-        cout << "--- Archivo 'programa.simp' no encontrado. Conservando carga interactiva linea por linea. ---\n\n";
+        cout << "--- Archivo 'programa.sml' no encontrado. Conservando carga interactiva linea por linea. ---\n\n";
         mostrarBienvenida();
         
         double entrada = 0.0;
@@ -75,7 +80,7 @@ void cargarPrograma(double memory[]) {
             if (entrada == -99999) break;
             
             if (!validarRango(entrada)) {
-                cout << "*** Error: Valor fuera del rango permitido (-9999 a +9999). Intente de nuevo. ***\n";
+                cout << "*** Error: Valor fuera del rango permitido (-99999 a +99999). Intente de nuevo. ***\n";
                 continue;
             }
             memory[ubicacion] = entrada;
@@ -100,7 +105,7 @@ void ejecutarPrograma(double memory[], double& accumulator, int& instructionCoun
                 double valorEntrada = 0.0;
                 bool entradaValida = false;
                 while (!entradaValida) {
-                    cout << "Ingrese un numero (-9999 a +9999): ";
+                    cout << "Ingrese un numero (-99999 a +99999): ";
                     cin >> valorEntrada;
                     if (validarRango(valorEntrada)) {
                         memory[operand] = valorEntrada;

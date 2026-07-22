@@ -1,0 +1,25 @@
+==================================================
+BITÁCORA DE EVIDENCIAS DE EJECUCIÓN - SIMPLETRON
+==================================================
+
+Fecha de generación: 21 de Julio de 2026
+Proyecto: Simulador Simpletron y Compilador del Lenguaje Simple
+Materia: Programación Avanzada
+
+--------------------------------------------------
+DESCRIPCIÓN DE LAS CAPTURAS DE PANTALLA (EVIDENCIAS)
+--------------------------------------------------
+
+1. SCR-20260721-pmtl.png
+   - Descripción: Prueba de compilación y generación de código SML (Simpletron Machine Language).
+   - Detalles: Muestra el proceso de traducción en primera y segunda pasada del código fuente escrito en Lenguaje Simple (.simp) hacia instrucciones máquina SML (.sml).
+   - Verificación: Comprobación de la asignación correcta de direcciones en la Tabla de Símbolos, resolución de saltos condicionales/incondicionales (GOTO, IF) y evaluación de expresiones aritméticas mediante pila en notación postfija.
+
+2. SCR-20260721-pwxk.png
+   - Descripción: Ejecución del Simulador Simpletron y volcado de memoria (Computer Dump).
+   - Detalles: Muestra la lectura automática del archivo cargado ('programa.sml'), la ejecución instrucción por instrucción en el simulador en punto flotante y el despliegue final de los registros principales (Acumulador, Contador de Instrucciones, Registro de Instrucción, Código de Operación y Operando) junto con el mapa de memoria de 1000 posiciones.
+   - Verificación: Confirmación del correcto procesamiento de datos, manejo de entrada/salida (READ, WRITE, NEWLINE) y terminación limpia de la ejecución.
+
+--------------------------------------------------
+ESTADO DEL PROYECTO: Finalizado al 100% y validado para entrega.
+==================================================
